@@ -19,7 +19,7 @@ public class MiniCScanner {
      * Token을 추출해낼 때 어떤 토큰을 인식하고 있는지 나타내기 위한 State
      */
     private enum State {
-        Initial, Dec, Oct, Hex, IDorKeyword, Operator, Zero, PreHex
+        Initial, Dec, Oct, Hex, IDorKeyword, Operator, Zero, PreHex, SingleOperator
     }
 
     /**
@@ -88,17 +88,17 @@ public class MiniCScanner {
             if (Character.isWhitespace(c)) { // white space (needs trimming)
                 if(state != State.Initial) break; // 만약 글자들을 인식하고 있었다면 그대로 종결
                 else continue;
-            } else if (isSpecialChar(c) || isSingleSpecialToken(c)) { // 특수문자일 경우
-                if (state == State.Initial) { // 특수문자를 인식함
-                    state = State.Operator;
-                    if (isSingleSpecialToken(c)) { // signle operator ( '(', ')', '{', '}', ',', '[', ']', ';', EOF )
-                        tokenString = String.valueOf(c);
-                        break;
-                    }
-                } else if (state != State.Operator) {
-                    // 다른 문자를 인식하는 도중에 특수문자를 읽었을 경우 while문 탈출
+            } else if (isSingleSpecialToken(c)) { // signle operator ( '(', ')', '{', '}', ',', '[', ']', ';', EOF )
+                if (state == State.Initial) { // 처음부터 1글자짜리
+                    state = State.SingleOperator;
+                    tokenString = String.valueOf(c);
+                } else { --idx; }
+                break;
+            } else if (isSpecialChar(c)) { // 1글자짜리 연산자가 아닌 2글자 이상의 연산자가 될 수 있는 연산자일 경우
+                if (state != State.Initial && state != State.Operator) {
                     --idx; break;
                 }
+                state = State.Operator;
             } else if (state == State.Initial && c == '0') { // Zero를 인식할 경우
                 state = State.Zero;
             } else if (Character.isDigit(c)) { // 숫자를 인식한 경우
@@ -108,6 +108,9 @@ public class MiniCScanner {
                     state = State.Oct;
                 else if (state == State.PreHex) // 0x 까지 인식하고 있었을 경우, 16진수로 취급
                     state = State.Hex;
+                else if (state == State.Operator) { // 연산자가 나온 뒤 숫자가 나올경우 while문 탈출
+                    --idx; break;
+                }
             } else if (state == State.Zero && c == 'x') { // 0x까지 인식 했을 경우
                 state = State.PreHex;
             } else if (Character.isAlphabetic(c) || c == '_') { // underscore 혹은 알파벳을 인식했을 경우
@@ -138,7 +141,7 @@ public class MiniCScanner {
 
     /**
      *
-     * @param c
+     * @param c - 특수문자인지 확인하는 
      * @return
      */
     private boolean isSpecialChar(char c) {
@@ -179,6 +182,7 @@ public class MiniCScanner {
             case IDorKeyword:
                 return Token.SymbolType.IDorKeyword;
             case Operator:
+            case SingleOperator:
                 return Token.SymbolType.Operator;
             // 종결상태가 아닌 State의 경우 NULL Type을 반환 (인식실패)
             case Initial:
@@ -216,3 +220,4 @@ public class MiniCScanner {
         return false;
     }
 }
+=
