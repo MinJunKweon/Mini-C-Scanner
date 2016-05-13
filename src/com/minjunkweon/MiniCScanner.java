@@ -11,6 +11,7 @@ import java.io.IOException;
 public class MiniCScanner {
     static public final char EOF = '\255'; // 파일의 끝을 의미하는 EOF 문자 상수
     static public final String SPECIAL_CHARS = "!=%&*+-/<>|"; // 두 글자 이상이 하나의 토큰일 수 있는 특수문자들
+    static public final int ID_LENGTH = 12; // 컴파일러를 구현할 때에는 명칭의 길이에 제한을 두는 것이 좋다
 
     private String src; // Source Code의 전체 내용을 String으로 저장하기 위한 변수
     private Integer idx; // Source Code를 읽을 때 cursor 역할을 하는 변수
@@ -124,6 +125,10 @@ public class MiniCScanner {
             tokenString += String.valueOf(c); // 토큰 String에 글자 추가
         }
         symType = getSymbolType(state); // 인식한 state로부터 토큰이 어떤 값을 의미하는지 대분류
+        if (symType == Token.SymbolType.IDorKeyword && tokenString.length() > ID_LENGTH) {
+            // 명칭의 길이가 제한을 넘어갈 경우 에러로 처리
+            // ERROR : 명칭의 길이 초과
+        }
         token.setSymbol(tokenString, symType); // tokenString과 함께 대분류한 타입을 전달하여 token을 세팅
         return token; // 인식한 token을 반환
     }
