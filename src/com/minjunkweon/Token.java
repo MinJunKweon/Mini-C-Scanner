@@ -2,6 +2,7 @@ package com.minjunkweon;
 
 /**
  * Mini C Scanner에서 사용할 Token의 Model 클래스
+ * Created by kweonminjun on 2016. 5. 13..
  */
 public class Token {
     /**

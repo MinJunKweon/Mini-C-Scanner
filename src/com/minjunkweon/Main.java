@@ -2,6 +2,7 @@ package com.minjunkweon;
 
 /**
  * 프로그램의 흐름을 담당하는 Main 클래스
+ * Created by kweonminjun on 2016. 5. 13..
  */
 public class Main {
     /**
@@ -14,7 +15,6 @@ public class Main {
             System.err.print("Please enter the file path (by debug argument)");
             return;
         }
-
         MiniCScanner sc = new MiniCScanner(args[0]); // Mini C Scanner 객체
         Token tok = null; // Mini C Scanner에서 얻어낸 token을 저장하기 위한 Token 변수
         while ((tok = sc.getToken()).getSymbolOrdinal() != -1) // Mini C Scanner에서 다 읽을 때까지 token을 얻어 출력

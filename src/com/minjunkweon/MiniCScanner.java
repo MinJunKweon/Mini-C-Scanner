@@ -7,6 +7,7 @@ import java.io.IOException;
 
 /**
  * Token을 가져오기 위한 처리를 담당하는 Scanner 클래스
+ * Created by kweonminjun on 2016. 5. 13..
  */
 public class MiniCScanner {
     static public final char EOF = '\255'; // 파일의 끝을 의미하는 EOF 문자 상수
@@ -41,24 +42,24 @@ public class MiniCScanner {
      * @return 소스코드 파일의 내용 (String)
      */
     private String parseFile(String filePath) {
-        String src = "", readedString = "";
-        FileReader fileReader = null;
+        String src = "", readedString = ""; // src: 소스코드를 저장해놓을 String 변수, readedString: 소스코드의 한줄을 담아놓을 String 변수
+        FileReader fileReader = null; // 소스코드를 읽을 File Reader
         try {
-            fileReader = new FileReader(new File(filePath));
+            fileReader = new FileReader(new File(filePath)); // 파일 경로를 이용해 File Reader 생성
         } catch (IOException e) {
+            // 파일을 읽을 수 없음
             System.err.print("ERROR!\n" + e.getMessage() + "\n" + e.getStackTrace());
-            System.exit(-1);
         }
 
-        BufferedReader reader = new BufferedReader(fileReader);
+        BufferedReader reader = new BufferedReader(fileReader); // BufferedReader 객체를 만들어 소스코드 파일을 읽음
         try {
-            while ((readedString = reader.readLine()) != null)
-                src += readedString + "\n";
+            while ((readedString = reader.readLine()) != null) // 파일로부터 한줄 읽음
+                src += readedString + "\n"; // 한줄 맨뒤에 개행문자 추가
             src += EOF;   // 파일의 끝을 의미하는 EOF 문자 추가
             reader.close();
         } catch (IOException e) {
+            // 파일을 읽을 수 없음
             System.err.print("ERROR!\n" + e.getMessage() + "\n" + e.getStackTrace());
-            System.exit(-1);
         }
         return src;
     }
@@ -145,9 +146,10 @@ public class MiniCScanner {
     }
 
     /**
+     * 문자가 특수문자(1글자 연산자 제외)인지 확인하는 Method
      *
-     * @param c - 특수문자인지 확인하는 
-     * @return
+     * @param c - 확인의 대상 문자
+     * @return 특수문자(1글자 연산자 제외)일 경우 true 반환, 아닐경우 false 반환
      */
     private boolean isSpecialChar(char c) {
         for (int i = 0; i < SPECIAL_CHARS.length(); ++i)
@@ -157,9 +159,10 @@ public class MiniCScanner {
     }
 
     /**
+     * 문자가 1글자 연산자인지 확인하는 Method
      *
-     * @param c
-     * @return
+     * @param c - 확인의 대상 문자
+     * @return 1글자 연산자일 경우 true 반환, 아닐경우 false 반환
      */
     private boolean isSingleSpecialToken(char c) {
         switch (c) {
@@ -173,19 +176,23 @@ public class MiniCScanner {
     }
 
     /**
+     * 추출한 token의 타입이 어떤 타입인지 state에 따라 분류
      *
-     * @param s
-     * @return
+     * @param s - 인식된 state
+     * @return state에 해당하는 심볼 타입
      */
     private Token.SymbolType getSymbolType(State s) {
         switch (s) {
+            // 숫자일 경우 (10진수, 8진수, 16진수, 0)
             case Dec:
             case Oct:
             case Hex:
             case Zero:
                 return Token.SymbolType.Digit;
+            // 명칭 혹은 키워드일 경우
             case IDorKeyword:
                 return Token.SymbolType.IDorKeyword;
+            // 연산자일 경우
             case Operator:
             case SingleOperator:
                 return Token.SymbolType.Operator;
@@ -198,31 +205,30 @@ public class MiniCScanner {
     }
 
     /**
+     * 현재 소스코드 파일에 대한 커서(idx)로부터 유효한 토큰이 나올 때까지 주석을 무시하는 Method
      *
-     * @return
+     * @return block comment에 에러가 있을 경우 true, 아니면 false 반환
      */
     private boolean exceptComment() {
         char c;
-        // 문자열 trim
+        // 커서로부터 whitespace 문자들 모두 무시
         while (!isEOF(idx) && Character.isWhitespace(src.charAt(idx))) idx++;
-        if (isEOF(idx)) return false;
+        if (isEOF(idx)) return false; // whitespace 문자들을 모두 무시했는데 파일의 끝일 경우 성공적으로 주석 제거를 했다고 반환
 
-        if (src.charAt(idx) == '/') {
-            if (isEOF(idx+1)) return true;   // ERROR: 마지막 줄에 세미콜론이 오지않음 (/이 옴)
-            else if (src.charAt(idx+1) == '/') {    // Line Comment
-                idx += 2;
-                while (!isEOF(idx) && src.charAt(idx) != '\n') idx++; // 개행문자 혹은 EOF 문자
-                idx += 1;
+        if (src.charAt(idx) == '/') { // '/'가 나올 경우
+            if (src.charAt(idx+1) == '/') {    // Line Comment
+                idx += 2; // "//" 다음 문자로 커서 이동
+                while (!isEOF(idx) && src.charAt(idx) != '\n') idx++; // 개행문자 혹은 EOF 문자가 나올 때까지 커서 이동
+                if (!isEOF(idx)) idx += 1; // 개행문자 다음에 문자가 있을 경우, 그 문자로 커서 이동
             } else if (src.charAt(idx+1) == '*') { // Block Comment
-                idx += 2;
-                while (src.charAt(idx) != '*' && src.charAt(idx+1) != '/') {
-                    if (isEOF(idx+1)) return true;
+                idx += 2; // "/*" 다음 문자로 커서 이동
+                while (src.charAt(idx) != '*' && src.charAt(idx+1) != '/') { // */가 나올때 까지
+                    if (isEOF(idx+1)) return true; // 불완전한 block comment이므로 에러가 있다고 반화
                     idx++;
                 }
-                idx += 2;
+                idx += 2; // "*/" 다음 문자로 커서 이동
             }
         }
-        return false;
+        return false; // 에러가 없이 성공적으로 주석 제거
     }
 }
-=
