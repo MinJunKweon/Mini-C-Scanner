@@ -45,5 +45,15 @@
   }
 ```
 
+#### And more [Example Sources](https://github.com/MinJunKweon/Mini-C-Scanner/tree/master/source), [Results](https://github.com/MinJunKweon/Mini-C-Scanner/tree/master/result)
+
+
+## Struct
+#### Class Diagram
+![Class Diagram](http://i.imgur.com/MYw3WCM.png)
+
+#### State Diagram in Scanner
+![State Diagram](http://i.imgur.com/V3Kvf8H.png)
+
 ## TODO
-- [ ] Handling Lexical Error
+- [x] Handling Lexical Error

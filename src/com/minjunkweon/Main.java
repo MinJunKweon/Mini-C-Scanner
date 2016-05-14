@@ -16,7 +16,7 @@ public class Main {
             return;
         }
         MiniCScanner sc = new MiniCScanner(args[0]); // Mini C Scanner 객체
-        Token tok = null; // Mini C Scanner에서 얻어낸 token을 저장하기 위한 Token 변수
+        Token tok; // Mini C Scanner에서 얻어낸 token을 저장하기 위한 Token 변수
         while ((tok = sc.getToken()).getSymbolOrdinal() != -1) // Mini C Scanner에서 다 읽을 때까지 token을 얻어 출력
             System.out.println(tok);
     }
