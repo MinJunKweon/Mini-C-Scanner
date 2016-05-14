@@ -185,6 +185,6 @@ public class Token {
      * @return 토큰을 표현하기 위한 String
      */
     public String toString() {
-        return "Token ---> " + tokenString + "\t : (" + getSymbolOrdinal() + ", "+ getSymbolValue() + ")";
+        return tokenString + "\t : (" + getSymbolOrdinal() + ", "+ getSymbolValue() + ")";
     }
 }
