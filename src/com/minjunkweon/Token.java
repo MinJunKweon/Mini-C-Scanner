@@ -103,10 +103,17 @@ public class Token {
             case "{":   return TokenSymbol.LBrace;
             case "||":  return TokenSymbol.Or;
             case "}":   return TokenSymbol.RBrace;
-
-            default: // 인식하지 못한
-                return TokenSymbol.NULL;
+            case "&":
+                System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.SingleAmpersand));
+                break;
+            case "|":
+                System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.SingleBar));
+                break;
+            default: // 인식하지 못한 TokenSymbol
+                System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.InvalidChar));
+                break;
         }
+        return TokenSymbol.NULL;
     }
 
     /**

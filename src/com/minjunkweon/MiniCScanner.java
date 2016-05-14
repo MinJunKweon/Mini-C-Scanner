@@ -48,7 +48,8 @@ public class MiniCScanner {
             fileReader = new FileReader(new File(filePath)); // 파일 경로를 이용해 File Reader 생성
         } catch (IOException e) {
             // 파일을 읽을 수 없음
-            System.err.print("ERROR!\n" + e.getMessage() + "\n" + e.getStackTrace());
+            System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.CannotOpenFile));
+            return "";
         }
 
         BufferedReader reader = new BufferedReader(fileReader); // BufferedReader 객체를 만들어 소스코드 파일을 읽음
@@ -59,7 +60,8 @@ public class MiniCScanner {
             reader.close();
         } catch (IOException e) {
             // 파일을 읽을 수 없음
-            System.err.print("ERROR!\n" + e.getMessage() + "\n" + e.getStackTrace());
+            System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.CannotOpenFile));
+            return "";
         }
         return src;
     }
@@ -80,8 +82,8 @@ public class MiniCScanner {
         // 현재 커서로부터 Comment 제거
         if (exceptComment()) {
             // Comment를 지우는 도중에 ERROR가 발생했을 경우
-            System.err.println("ERROR! : incomplete comment");
-            System.exit(-1);    // 프로그램 종료
+            System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.InvalidComment));
+            return token;
         }
 
         while (!isEOF(idx)) { // 소스코드를 전부 읽을때 까지 계속
@@ -129,6 +131,8 @@ public class MiniCScanner {
         if (symType == Token.SymbolType.IDorKeyword && tokenString.length() > ID_LENGTH) {
             // 명칭의 길이가 제한을 넘어갈 경우 에러로 처리
             // ERROR : 명칭의 길이 초과
+            System.err.print(LexicalError.getErrorMessage(LexicalError.ErrorCode.AboveIDLimit));
+            return token;
         }
         token.setSymbol(tokenString, symType); // tokenString과 함께 대분류한 타입을 전달하여 token을 세팅
         return token; // 인식한 token을 반환
