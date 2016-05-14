@@ -5,10 +5,20 @@ package com.minjunkweon;
  * Created by kweonminjun on 2016. 5. 13..
  */
 public class LexicalError {
+    /**
+     * 에러의 종류를 나타내는 에러 코드
+     */
     public enum ErrorCode {
         CannotOpenFile, AboveIDLimit, SingleAmpersand, SingleBar, InvalidChar, InvalidComment
     }
 
+    /**
+     * 클래스 메소드
+     * 에러 코드에 따른 에러메시지를 얻는 메소드
+     *
+     * @param code - 에러코드
+     * @return 그에 해당하는 에러메시지
+     */
     public static String getErrorMessage(ErrorCode code) {
         String msg;
         msg = "Lexical Error(code: " + code.ordinal() + ")\n";
